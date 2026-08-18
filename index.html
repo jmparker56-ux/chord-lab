@@ -26,7 +26,7 @@ select{width:100%;margin-top:6px}.row2{display:grid;grid-template-columns:1fr 1f
 .result{text-align:center;background:linear-gradient(#1b3026,#14231c);border:1px solid #355845;border-radius:16px;padding:15px;margin-top:12px}.result .big{font-size:40px;font-weight:950;margin:4px 0}.muted{color:var(--muted)}.formula{color:#d9eadf;margin-top:5px}
 h2{font-size:19px;margin:0 0 12px}h3{font-size:16px;margin:14px 0 8px}
 .lookupControls{display:grid;grid-template-columns:1fr 1.25fr;gap:8px}.voicings{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
-.voicing{background:#111923;border:1px solid #314054;border-radius:14px;padding:10px;text-align:center}.voicing b{display:block;margin-bottom:4px}.fretsText{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--good);font-size:14px}
+.voicing{background:#111923;border:1px solid #314054;border-radius:14px;padding:10px;text-align:center}.voicing b{display:block;margin-bottom:4px}.voicing .kind{color:#f1c75b;font-size:12px;font-weight:900;letter-spacing:.4px;margin-bottom:3px}.fretsText{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--good);font-size:14px}
 svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block}
 .notes{font-size:12px;color:var(--muted);line-height:1.35}
 .star{border:1px solid #536178;background:#202b39;color:#f5d878;border-radius:9px;padding:7px 9px;font-weight:900;margin-top:7px}
@@ -94,7 +94,7 @@ svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block
 <div class="card"><h2>Common chords in this major key</h2><div id="related" class="related"></div></div>
 </section>
 
-<div class="tiny">Chord names can be ambiguous. Your ear and the musical context get the final vote.</div>
+<div class="tiny">Chord names can be ambiguous. Your ear and the musical context get the final vote.<br>Chord Lab v6 — player-first guitar & uke voicings</div>
 </div>
 <script>
 const N=["C","C♯","D","E♭","E","F","F♯","G","A♭","A","B♭","B"];
@@ -150,27 +150,234 @@ function updateFind(){
 }
 findInst.onchange=renderFind;findMode.onchange=renderFind;clearFind.onclick=()=>{[...findStrings.querySelectorAll("input,select")].forEach(e=>e.value="");updateFind()};exampleFind.onclick=()=>{findMode.value="fret";renderFind();[...findStrings.querySelectorAll("input")].forEach((e,i)=>e.value=inst[findInst.value].example[i]);updateFind()};renderFind();
 
+
+
+const knownShapes = {
+  guitar: {
+    "0:maj":{arr:["x",3,2,0,1,0],fingers:["x",3,2,0,1,0],kind:"Open Position"},
+    "2:maj":{arr:["x","x",0,2,3,2],fingers:["x","x",0,1,3,2],kind:"Open Position"},
+    "4:maj":{arr:[0,2,2,1,0,0],fingers:[0,2,3,1,0,0],kind:"Open Position"},
+    "7:maj":{arr:[3,2,0,0,0,3],fingers:[2,1,0,0,0,3],kind:"Open Position"},
+    "9:maj":{arr:["x",0,2,2,2,0],fingers:["x",0,1,2,3,0],kind:"Open Position"},
+    "9:min":{arr:["x",0,2,2,1,0],fingers:["x",0,2,3,1,0],kind:"Open Position"},
+    "2:min":{arr:["x","x",0,2,3,1],fingers:["x","x",0,2,3,1],kind:"Open Position"},
+    "4:min":{arr:[0,2,2,0,0,0],fingers:[0,2,3,0,0,0],kind:"Open Position"},
+    "0:7":{arr:["x",3,2,3,1,0],fingers:["x",3,2,4,1,0],kind:"Open Position"},
+    "2:7":{arr:["x","x",0,2,1,2],fingers:["x","x",0,2,1,3],kind:"Open Position"},
+    "4:7":{arr:[0,2,0,1,0,0],fingers:[0,2,0,1,0,0],kind:"Open Position"},
+    "7:7":{arr:[3,2,0,0,0,1],fingers:[3,2,0,0,0,1],kind:"Open Position"},
+    "9:7":{arr:["x",0,2,0,2,0],fingers:["x",0,2,0,3,0],kind:"Open Position"},
+    "0:maj7":{arr:["x",3,2,0,0,0],fingers:["x",3,2,0,0,0],kind:"Open Position"},
+    "2:maj7":{arr:["x","x",0,2,2,2],fingers:["x","x",0,1,1,1],kind:"Open Position"},
+    "4:maj7":{arr:[0,2,1,1,0,0],fingers:[0,3,1,2,0,0],kind:"Open Position"},
+    "9:maj7":{arr:["x",0,2,1,2,0],fingers:["x",0,2,1,3,0],kind:"Open Position"},
+    "9:m7":{arr:["x",0,2,0,1,0],fingers:["x",0,2,0,1,0],kind:"Open Position"},
+    "2:m7":{arr:["x","x",0,2,1,1],fingers:["x","x",0,2,1,1],kind:"Open Position"},
+    "4:m7":{arr:[0,2,0,0,0,0],fingers:[0,2,0,0,0,0],kind:"Open Position"},
+    "2:sus2":{arr:["x","x",0,2,3,0],fingers:["x","x",0,1,2,0],kind:"Open Position"},
+    "2:sus4":{arr:["x","x",0,2,3,3],fingers:["x","x",0,1,2,3],kind:"Open Position"},
+    "9:sus2":{arr:["x",0,2,2,0,0],fingers:["x",0,1,2,0,0],kind:"Open Position"},
+    "9:sus4":{arr:["x",0,2,2,3,0],fingers:["x",0,1,2,3,0],kind:"Open Position"},
+    "4:sus4":{arr:[0,2,2,2,0,0],fingers:[0,1,2,3,0,0],kind:"Open Position"},
+    "0:add9":{arr:["x",3,2,0,3,3],fingers:["x",2,1,0,3,4],kind:"Open Position"},
+    "7:add9":{arr:[3,2,0,2,0,3],fingers:[3,2,0,1,0,4],kind:"Open Position"}
+  },
+
+  lowg: {
+    "0:maj":{arr:[0,0,0,3],fingers:[0,0,0,3],kind:"Open Position"},
+    "2:maj":{arr:[2,2,2,0],fingers:[1,2,3,0],kind:"Open Position"},
+    "4:maj":{arr:[1,4,0,2],fingers:[1,4,0,2],kind:"Open Position"},
+    "5:maj":{arr:[2,0,1,0],fingers:[2,0,1,0],kind:"Open Position"},
+    "7:maj":{arr:[0,2,3,2],fingers:[0,1,3,2],kind:"Open Position"},
+    "9:maj":{arr:[2,1,0,0],fingers:[2,1,0,0],kind:"Open Position"},
+    "11:maj":{arr:[4,3,2,2],fingers:[4,3,1,1],kind:"Open Position"},
+    "0:min":{arr:[0,3,3,3],fingers:[0,1,2,3],kind:"Open Position"},
+    "2:min":{arr:[2,2,1,0],fingers:[2,3,1,0],kind:"Open Position"},
+    "4:min":{arr:[0,4,3,2],fingers:[0,3,2,1],kind:"Open Position"},
+    "5:min":{arr:[1,0,1,3],fingers:[1,0,2,4],kind:"Open Position"},
+    "7:min":{arr:[0,2,3,1],fingers:[0,2,3,1],kind:"Open Position"},
+    "9:min":{arr:[2,0,0,0],fingers:[2,0,0,0],kind:"Open Position"},
+    "11:min":{arr:[4,2,2,2],fingers:[3,1,1,1],kind:"Open Position"},
+    "0:7":{arr:[0,0,0,1],fingers:[0,0,0,1],kind:"Open Position"},
+    "2:7":{arr:[2,2,2,3],fingers:[1,1,1,2],kind:"Open Position"},
+    "4:7":{arr:[1,2,0,2],fingers:[1,2,0,3],kind:"Open Position"},
+    "5:7":{arr:[2,3,1,3],fingers:[2,3,1,4],kind:"Open Position"},
+    "7:7":{arr:[0,2,1,2],fingers:[0,2,1,3],kind:"Open Position"},
+    "9:7":{arr:[0,1,0,0],fingers:[0,1,0,0],kind:"Open Position"},
+    "11:7":{arr:[2,3,2,2],fingers:[1,2,1,1],kind:"Open Position"},
+    "0:maj7":{arr:[0,0,0,2],fingers:[0,0,0,2],kind:"Open Position"},
+    "5:maj7":{arr:[2,4,1,3],fingers:[2,4,1,3],kind:"Open Position"},
+    "7:maj7":{arr:[0,2,2,2],fingers:[0,1,1,1],kind:"Open Position"},
+    "9:maj7":{arr:[1,1,0,0],fingers:[1,2,0,0],kind:"Open Position"},
+    "0:m7":{arr:[3,3,3,3],fingers:[1,1,1,1],kind:"Open Position"},
+    "2:m7":{arr:[2,2,1,3],fingers:[2,3,1,4],kind:"Open Position"},
+    "4:m7":{arr:[0,2,0,2],fingers:[0,1,0,2],kind:"Open Position"},
+    "7:m7":{arr:[0,2,1,1],fingers:[0,2,1,1],kind:"Open Position"},
+    "9:m7":{arr:[0,0,0,0],fingers:[0,0,0,0],kind:"Open Position"},
+    "0:sus2":{arr:[0,2,3,3],fingers:[0,1,2,3],kind:"Open Position"},
+    "0:sus4":{arr:[0,0,1,3],fingers:[0,0,1,3],kind:"Open Position"},
+    "2:sus2":{arr:[2,2,0,0],fingers:[1,2,0,0],kind:"Open Position"},
+    "2:sus4":{arr:[0,2,3,0],fingers:[0,1,2,0],kind:"Open Position"},
+    "7:sus2":{arr:[0,2,3,0],fingers:[0,1,2,0],kind:"Open Position"},
+    "7:sus4":{arr:[0,2,3,3],fingers:[0,1,2,3],kind:"Open Position"},
+    "9:sus2":{arr:[2,4,0,0],fingers:[1,3,0,0],kind:"Open Position"},
+    "9:sus4":{arr:[2,2,0,0],fingers:[1,2,0,0],kind:"Open Position"}
+  },
+
+  highg:{},
+
+  bari:{
+    "0:maj":{arr:[2,0,1,0],fingers:[2,0,1,0],kind:"Open Position"},
+    "2:maj":{arr:[0,2,3,2],fingers:[0,1,3,2],kind:"Open Position"},
+    "4:maj":{arr:[2,1,0,0],fingers:[2,1,0,0],kind:"Open Position"},
+    "5:maj":{arr:[3,2,1,1],fingers:[4,3,1,1],kind:"Open Position"},
+    "7:maj":{arr:[0,0,0,3],fingers:[0,0,0,3],kind:"Open Position"},
+    "9:maj":{arr:[2,2,2,0],fingers:[1,2,3,0],kind:"Open Position"},
+    "11:maj":{arr:[4,4,4,2],fingers:[2,3,4,1],kind:"Open Position"},
+
+    "0:min":{arr:[1,0,1,3],fingers:[1,0,2,4],kind:"Open Position"},
+    "2:min":{arr:[0,2,3,1],fingers:[0,2,3,1],kind:"Open Position"},
+    "4:min":{arr:[2,0,0,0],fingers:[2,0,0,0],kind:"Open Position"},
+    "7:min":{arr:[0,3,3,3],fingers:[0,1,2,3],kind:"Open Position"},
+    "9:min":{arr:[2,2,1,0],fingers:[2,3,1,0],kind:"Open Position"},
+
+    "0:7":{arr:[2,3,1,3],fingers:[2,3,1,4],kind:"Open Position"},
+    "2:7":{arr:[0,2,1,2],fingers:[0,2,1,3],kind:"Open Position"},
+    "4:7":{arr:[0,1,0,0],fingers:[0,1,0,0],kind:"Open Position"},
+    "7:7":{arr:[0,0,0,1],fingers:[0,0,0,1],kind:"Open Position"},
+    "9:7":{arr:[2,2,2,3],fingers:[1,1,1,2],kind:"Open Position"},
+
+    "0:maj7":{arr:[2,4,1,3],fingers:[2,4,1,3],kind:"Open Position"},
+    "2:maj7":{arr:[0,2,2,2],fingers:[0,1,1,1],kind:"Open Position"},
+    "7:maj7":{arr:[0,0,0,2],fingers:[0,0,0,2],kind:"Open Position"},
+
+    "0:m7":{arr:[1,3,1,3],fingers:[1,3,1,4],kind:"Open Position"},
+    "2:m7":{arr:[0,2,1,1],fingers:[0,2,1,1],kind:"Open Position"},
+    "4:m7":{arr:[0,0,0,0],fingers:[0,0,0,0],kind:"Open Position"}
+  }
+};
+knownShapes.highg = knownShapes.lowg;
+
+// Movable guitar and uke shape families.
+// The uke shapes are conventional compact barre/movable families; after transposition
+// the app still verifies the actual chord tones and labels inversions correctly.
+function makeBarreShapes(root,t,key){
+  const out=[], id=t.id;
+  function add(arr,fingers,kind="Barre Chord"){
+    if(!arr.some(x=>x!=="x"&&x>15)) out.push({arr,fingers,kind});
+  }
+
+  if(key==="guitar"){
+    const fromE=pc(root-4), fromA=pc(root-9);
+    if(["maj","min","7","maj7","m7","sus4"].includes(id) && fromE>0){
+      const f=fromE;
+      if(id==="maj") add([f,f+2,f+2,f+1,f,f],[1,3,4,2,1,1]);
+      if(id==="min") add([f,f+2,f+2,f,f,f],[1,3,4,1,1,1]);
+      if(id==="7") add([f,f+2,f,f+1,f,f],[1,3,1,2,1,1]);
+      if(id==="maj7") add([f,f+2,f+1,f+1,f,f],[1,4,2,3,1,1]);
+      if(id==="m7") add([f,f+2,f,f,f,f],[1,3,1,1,1,1]);
+      if(id==="sus4") add([f,f+2,f+2,f+2,f,f],[1,2,3,4,1,1]);
+    }
+    if(["maj","min","7","maj7","m7","sus2","sus4"].includes(id) && fromA>0){
+      const f=fromA;
+      if(id==="maj") add(["x",f,f+2,f+2,f+2,f],["x",1,3,3,3,1]);
+      if(id==="min") add(["x",f,f+2,f+2,f+1,f],["x",1,3,4,2,1]);
+      if(id==="7") add(["x",f,f+2,f,f+2,f],["x",1,3,1,4,1]);
+      if(id==="maj7") add(["x",f,f+2,f+1,f+2,f],["x",1,3,2,4,1]);
+      if(id==="m7") add(["x",f,f+2,f,f+1,f],["x",1,3,1,2,1]);
+      if(id==="sus2") add(["x",f,f+2,f+2,f,f],["x",1,3,4,1,1]);
+      if(id==="sus4") add(["x",f,f+2,f+2,f+3,f],["x",1,2,3,4,1]);
+    }
+    return out;
+  }
+
+  // GCEA tenor uke movable families.
+  if(key==="lowg" || key==="highg"){
+    // C-shape family: 0003 = C. Transpose by fret f.
+    const fC=pc(root-0);
+    if(fC>0 && fC<=9){
+      if(id==="maj") add([fC,fC,fC,fC+3],[1,1,1,4],"Movable Shape");
+      if(id==="7") add([fC,fC,fC,fC+1],[1,1,1,2],"Movable Shape");
+      if(id==="maj7") add([fC,fC,fC,fC+2],[1,1,1,3],"Movable Shape");
+    }
+    // A-family 2100 = A major; 2000 = Am.
+    const fA=pc(root-9);
+    if(fA>0 && fA<=9){
+      if(id==="maj") add([fA+2,fA+1,fA,fA],[3,2,1,1],"Movable Shape");
+      if(id==="min") add([fA+2,fA,fA,fA],[3,1,1,1],"Movable Shape");
+      if(id==="7") add([fA,fA+1,fA,fA],[1,2,1,1],"Movable Shape");
+    }
+    return out;
+  }
+
+  // DGBE baritone: same compact movable families as the top 4 guitar strings.
+  if(key==="bari"){
+    // D-shape major 0003 is G on baritone; transpose from G.
+    const fG=pc(root-7);
+    if(fG>0 && fG<=9){
+      if(id==="maj") add([fG,fG,fG,fG+3],[1,1,1,4],"Movable Shape");
+      if(id==="7") add([fG,fG,fG,fG+1],[1,1,1,2],"Movable Shape");
+      if(id==="maj7") add([fG,fG,fG,fG+2],[1,1,1,3],"Movable Shape");
+    }
+    // E-family top-4 strings: 2000 = Em, 2100 = E major.
+    const fE=pc(root-4);
+    if(fE>0 && fE<=9){
+      if(id==="maj") add([fE+2,fE+1,fE,fE],[3,2,1,1],"Movable Shape");
+      if(id==="min") add([fE+2,fE,fE,fE],[3,1,1,1],"Movable Shape");
+      if(id==="7") add([fE,fE+1,fE,fE],[1,2,1,1],"Movable Shape");
+    }
+  }
+  return out;
+}
+function bassPcForShape(shape,I){
+  let lowest=null;
+  shape.forEach((f,i)=>{if(f==="x")return;let m=I.open[i]+f;if(lowest===null||m<lowest)lowest=m});
+  return lowest===null?null:pc(lowest);
+}
+
 function shapeCandidates(I,root,t){
  const target=new Set(t.iv.map(x=>pc(root+x))), strings=I.open.length, candidates=[];
- function rec(i,arr,midis){
-  if(i===strings){let sounding=arr.map((f,j)=>f==="x"?null:I.open[j]+f).filter(x=>x!=null);if(sounding.length<Math.min(3,strings))return;let pcs=uniq(sounding.map(pc));let tgt=uniq([...target]);if(!same(pcs,tgt))return;let fretted=arr.filter(x=>x!=="x"&&x>0);let span=fretted.length?Math.max(...fretted)-Math.min(...fretted):0;if(span>4)return;let mute=arr.filter(x=>x==="x").length;let avg=fretted.length?fretted.reduce((a,b)=>a+b,0)/fretted.length:0;let score=100-span*8-mute*5-avg*.7+(arr.includes(0)?4:0);candidates.push({arr:[...arr],score}) ;return}
-  let opts=["x"];for(let f=0;f<=12;f++)if(target.has(pc(I.open[i]+f)))opts.push(f);
-  for(const f of opts){arr.push(f);rec(i+1,arr,midis);arr.pop()}
+ function rec(i,arr){
+  if(i===strings){
+   let sounding=arr.map((f,j)=>f==="x"?null:I.open[j]+f).filter(x=>x!=null);
+   if(sounding.length<Math.min(3,strings))return;
+   let pcs=uniq(sounding.map(pc)), tgt=uniq([...target]); if(!same(pcs,tgt))return;
+   let fretted=arr.filter(x=>x!=="x"&&x>0), span=fretted.length?Math.max(...fretted)-Math.min(...fretted):0;
+   if(span>4)return;
+   let mute=arr.filter(x=>x==="x").length, avg=fretted.length?fretted.reduce((a,b)=>a+b,0)/fretted.length:0;
+   let bass=bassPcForShape(arr,I), score=100-span*8-mute*5-avg*.7+(arr.includes(0)?4:0)+(bass===root?10:0);
+   candidates.push({arr:[...arr],score,kind:bass!==root?"Inversion":"Alternate Voicing"}); return
+  }
+  let opts=["x"]; for(let f=0;f<=12;f++)if(target.has(pc(I.open[i]+f)))opts.push(f);
+  for(const f of opts){arr.push(f);rec(i+1,arr);arr.pop()}
  }
- rec(0,[],[]);candidates.sort((a,b)=>b.score-a.score);
- let out=[];for(const c of candidates){if(!out.some(o=>o.arr.join(",")===c.arr.join(",")))out.push(c);if(out.length>=6)break}return out
+ rec(0,[]); candidates.sort((a,b)=>b.score-a.score);
+ let out=[]; for(const c of candidates){if(!out.some(o=>o.arr.join(",")===c.arr.join(",")))out.push(c);if(out.length>=10)break}
+ return out
+}
+
+function playerFirstShapes(key,I,root,t){
+  const out=[], known=knownShapes[key]?.[`${root}:${t.id}`];
+  if(known)out.push({...known,score:1000});
+  for(const b of makeBarreShapes(root,t,key))if(!out.some(x=>x.arr.join(",")===b.arr.join(",")))out.push({...b,score:800});
+  for(const c of shapeCandidates(I,root,t)){if(!out.some(x=>x.arr.join(",")===c.arr.join(",")))out.push(c);if(out.length>=6)break}
+  return out.slice(0,6)
+}
+
+function fingerFor(f,shape,fingers,index){
+  if(fingers && fingers[index]!==undefined && fingers[index]!=="x")return fingers[index];
+  let fs=uniq(shape.filter(x=>x!=="x"&&x>0)), idx=fs.indexOf(f); return Math.min(4,idx+1)
 }
 let left=false;
-function diagram(shape,I){
+function diagram(shape,I,fingers){
  let frets=shape.filter(x=>x!=="x"&&x>0), min=frets.length?Math.min(...frets):1, max=frets.length?Math.max(...frets):4, start=max<=4?1:Math.max(1,min), rows=4, w=150,h=155,pad=22, n=shape.length, xs=[...Array(n)].map((_,i)=>pad+(w-2*pad)*(left?(n-1-i):i)/(n-1||1)), top=35, bottom=135, dy=(bottom-top)/rows;
  let s=`<svg class="diagram" viewBox="0 0 ${w} ${h}" aria-label="chord diagram">`;
  for(let i=0;i<n;i++)s+=`<line x1="${xs[i]}" y1="${top}" x2="${xs[i]}" y2="${bottom}" stroke="#aab6c5" stroke-width="1.5"/>`;
  for(let r=0;r<=rows;r++)s+=`<line x1="${pad}" y1="${top+r*dy}" x2="${w-pad}" y2="${top+r*dy}" stroke="#aab6c5" stroke-width="${start===1&&r===0?4:1.5}"/>`;
  if(start>1)s+=`<text x="3" y="${top+dy*.7}" fill="#aab6c5" font-size="11">${start}</text>`;
- shape.forEach((f,i)=>{let x=xs[i];if(f==="x")s+=`<text x="${x-4}" y="18" fill="#ffaaaa" font-size="14">×</text>`;else if(f===0)s+=`<circle cx="${x}" cy="14" r="5" fill="none" stroke="#9ce2ae" stroke-width="2"/>`;else if(f>=start&&f<start+rows){let y=top+(f-start+.5)*dy;s+=`<circle cx="${x}" cy="${y}" r="8" fill="#f1c75b"/><text x="${x-3}" y="${y+4}" fill="#171717" font-size="10" font-weight="bold">${fingerFor(f,shape)}</text>`}});
+ shape.forEach((f,i)=>{let x=xs[i];if(f==="x")s+=`<text x="${x-4}" y="18" fill="#ffaaaa" font-size="14">×</text>`;else if(f===0)s+=`<circle cx="${x}" cy="14" r="5" fill="none" stroke="#9ce2ae" stroke-width="2"/>`;else if(f>=start&&f<start+rows){let y=top+(f-start+.5)*dy;s+=`<circle cx="${x}" cy="${y}" r="8" fill="#f1c75b"/><text x="${x-3}" y="${y+4}" fill="#171717" font-size="10" font-weight="bold">${fingerFor(f,shape,fingers,i)}</text>`}});
  return s+"</svg>"
 }
-function fingerFor(f,shape){let fs=uniq(shape.filter(x=>x!=="x"&&x>0));let idx=fs.indexOf(f);return Math.min(4,idx+1)}
 function soundingNotes(shape,I){return shape.map((f,i)=>f==="x"?"×":N[pc(I.open[i]+f)])}
 function loadFavs(){try{return JSON.parse(localStorage.getItem("chordlab-favs")||"[]")}catch{return[]}}
 function saveFav(name,key,shape){let f=loadFavs(),id=name+"|"+key+"|"+shape.join(",");let ix=f.findIndex(x=>x.id===id);if(ix>=0)f.splice(ix,1);else f.push({id,name,key,shape});localStorage.setItem("chordlab-favs",JSON.stringify(f));renderLookup();renderFavs()}
@@ -248,11 +455,18 @@ function renderSuggestions(){
 }
 
 function renderLookup(){
- let root=+lookupRoot.value,t=types[+lookupType.value],I=inst[lookupInst.value],name=chordName(root,t);
+ let root=+lookupRoot.value,t=types[+lookupType.value],key=lookupInst.value,I=inst[key],name=chordName(root,t);
  lookupInfo.innerHTML=`<div class="muted">CHORD</div><div class="big">${name}</div><div>Notes: ${notesFor(root,t).join(" • ")}</div><div class="formula">Formula: ${t.f}</div>`;
- let shapes=shapeCandidates(I,root,t);voicings.innerHTML="";
- shapes.forEach((c,ix)=>{let d=document.createElement("div");d.className="voicing";let id=name+"|"+lookupInst.value+"|"+c.arr.join(","),saved=loadFavs().some(x=>x.id===id);d.innerHTML=`<b>${ix===0?"Suggested":"Voicing "+(ix+1)}</b>${diagram(c.arr,I)}<div class="fretsText">${c.arr.join(" ")}</div><div class="notes">${soundingNotes(c.arr,I).join(" ")}</div><button class="star ${saved?"saved":""}">${saved?"★ Saved":"☆ Favorite"}</button>`;d.querySelector("button").onclick=()=>saveFav(name,lookupInst.value,c.arr);voicings.append(d)})
- if(!shapes.length)voicings.innerHTML=`<div class="muted">No compact shape found in the first 12 frets.</div>`;renderSuggestions();renderFavs()
+ let shapes=playerFirstShapes(key,I,root,t);voicings.innerHTML="";
+ shapes.forEach((c)=>{
+   let bass=bassPcForShape(c.arr,I), displayName=(bass!==null&&bass!==root)?`${name}/${N[bass]}`:name, kind=c.kind||(bass!==root?"Inversion":"Alternate Voicing");
+   let d=document.createElement("div");d.className="voicing";
+   let id=displayName+"|"+key+"|"+c.arr.join(","),saved=loadFavs().some(x=>x.id===id);
+   d.innerHTML=`<div class="kind">${kind}</div><b>${displayName}</b>${diagram(c.arr,I,c.fingers)}<div class="fretsText">${c.arr.join(" ")}</div><div class="notes">${soundingNotes(c.arr,I).join(" ")}</div><button class="star ${saved?"saved":""}">${saved?"★ Saved":"☆ Favorite"}</button>`;
+   d.querySelector("button").onclick=()=>saveFav(displayName,key,c.arr);voicings.append(d)
+ });
+ if(!shapes.length)voicings.innerHTML=`<div class="muted">No compact shape found in the first 12 frets.</div>`;
+ renderSuggestions();renderFavs()
 }
 [lookupRoot,lookupType,lookupInst].forEach(x=>x.onchange=renderLookup);leftToggle.onclick=()=>{left=!left;leftToggle.textContent=left?"Left-handed":"Right-handed";renderLookup()};renderLookup();
 
