@@ -14,7 +14,7 @@
 *{box-sizing:border-box} body{margin:0;background:linear-gradient(#101720,#090d12);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh}
 .app{width:min(760px,100%);margin:auto;padding:calc(12px + env(safe-area-inset-top)) 10px calc(28px + env(safe-area-inset-bottom))}
 header{padding:8px 4px 12px} h1{font-size:30px;margin:0;letter-spacing:-.6px}.tag{color:var(--muted);font-size:14px;margin-top:4px}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;position:sticky;top:0;z-index:5;background:rgba(12,17,24,.95);padding:8px 0 10px;backdrop-filter:blur(10px)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;position:sticky;top:0;z-index:5;background:rgba(12,17,24,.95);padding:8px 0 10px;backdrop-filter:blur(10px)}
 .tab{border:1px solid var(--line);background:var(--panel);color:#dce4ef;border-radius:12px;padding:11px 5px;font-weight:850;font-size:13px}.tab.active{border-color:var(--accent);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .screen{display:none}.screen.active{display:block}
@@ -33,14 +33,14 @@ svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block
 .star.saved{background:#4c421d;border-color:#c5a83d}
 .buildRoot{display:grid;grid-template-columns:1fr 1fr;gap:8px}.typeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.typeBtn{border:1px solid #3c4b60;background:#202b39;color:white;border-radius:10px;padding:10px 4px;font-weight:850}.typeBtn.active{border-color:var(--accent);color:var(--accent)}
 .changeGrid{display:grid;gap:7px}.change{background:#111923;border:1px solid #2e3b4d;border-radius:10px;padding:9px;font-size:14px}
-.related{display:flex;flex-wrap:wrap;gap:7px}.pill{background:#111923;border:1px solid #35445a;border-radius:999px;padding:7px 10px;font-weight:800}
+.related{display:flex;flex-wrap:wrap;gap:7px}.nashGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}.nashCell{background:#111923;border:1px solid #35445a;border-radius:11px;padding:9px 4px;text-align:center;cursor:pointer}.nashCell .num{font-weight:950;color:#f1c75b;font-size:12px}.nashCell .ch{font-weight:900;font-size:16px;margin-top:3px}.helperBox{background:#111923;border:1px solid #314054;border-radius:14px;padding:12px;margin-top:10px}.helperBig{font-size:28px;font-weight:950;margin:4px 0}.closest{display:grid;gap:7px;margin-top:9px}.closestItem{background:#111923;border:1px solid #314054;border-radius:10px;padding:9px;text-align:left}.closestItem b{color:#f1c75b}.pill{background:#111923;border:1px solid #35445a;border-radius:999px;padding:7px 10px;font-weight:800}
 .toggleRow{display:flex;align-items:center;justify-content:space-between;gap:10px}.switchBtn{border:1px solid var(--line);background:#202b39;color:white;border-radius:10px;padding:9px 12px;font-weight:800}
 .favs{display:grid;gap:7px}.fav{background:#111923;border:1px solid #314054;border-radius:10px;padding:9px;font-size:14px}
 .suggestGrid{display:grid;gap:8px}
 .suggestBtn{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;width:100%;text-align:left;background:#111923;border:1px solid #314054;color:var(--text);border-radius:11px;padding:10px 11px}
 .suggestBtn b{font-size:15px}.suggestBtn .why{color:var(--muted);font-size:13px;line-height:1.3}.suggestBtn .go{color:var(--accent);font-weight:950;font-size:18px}
 .tiny{font-size:12px;color:#7f8b99;text-align:center;padding:6px 0 14px}
-@media(max-width:430px){.app{padding-left:8px;padding-right:8px}.card{padding:12px}.string{grid-template-columns:54px 1fr 55px}.lookupControls{grid-template-columns:1fr 1fr}.typeGrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:430px){.app{padding-left:8px;padding-right:8px}.tabs{grid-template-columns:repeat(2,1fr)}.nashGrid{grid-template-columns:repeat(4,1fr)}.card{padding:12px}.string{grid-template-columns:54px 1fr 55px}.lookupControls{grid-template-columns:1fr 1fr}.typeGrid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -50,6 +50,7 @@ svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block
 <button class="tab active" data-screen="lookup">Choose a Chord</button>
 <button class="tab" data-screen="find">Find My Chord</button>
 <button class="tab" data-screen="build">Build a Chord</button>
+<button class="tab" data-screen="transpose">Capo / Nashville</button>
 </nav>
 
 <section id="find" class="screen">
@@ -72,6 +73,7 @@ svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block
 <div><label>Root</label><select id="lookupRoot"></select></div>
 <div><label>Chord</label><select id="lookupType"></select></div>
 </div>
+<div style="margin-top:9px"><label>Bass note / slash chord <span class="muted">(optional)</span></label><select id="lookupBass"></select></div>
 <div class="toggleRow" style="margin-top:10px"><span class="muted">Chord diagrams</span><button id="leftToggle" class="switchBtn">Right-handed</button></div>
 <div id="lookupInfo" class="result"></div>
 <h3>Ways to play it</h3><div id="voicings" class="voicings"></div>
@@ -94,7 +96,34 @@ svg.diagram{width:100%;max-width:170px;height:auto;margin:6px auto;display:block
 <div class="card"><h2>Common chords in this major key</h2><div id="related" class="related"></div></div>
 </section>
 
-<div class="tiny">Chord names can be ambiguous. Your ear and the musical context get the final vote.<br>Chord Lab v6 — player-first guitar & uke voicings</div>
+
+<section id="transpose" class="screen">
+<div class="card">
+<h2>Capo Helper</h2>
+<div class="muted">Choose the chord shape you are fingering and the capo fret. Chord Lab shows the chord that actually sounds.</div>
+<div style="margin-top:10px"><label>Instrument</label><select id="capoInst"></select></div>
+<div class="lookupControls" style="margin-top:9px">
+<div><label>Shape root</label><select id="capoRoot"></select></div>
+<div><label>Chord</label><select id="capoType"></select></div>
+</div>
+<div style="margin-top:9px"><label>Capo fret</label><select id="capoFret"></select></div>
+<div id="capoResult" class="helperBox"></div>
+</div>
+
+<div class="card">
+<h2>Nashville Number Quick Reference</h2>
+<div class="muted">Pick a major key. The same numbers keep the same harmonic job when you transpose to another key.</div>
+<div style="margin-top:10px"><label>Major key</label><select id="nashKey"></select></div>
+<div id="nashGrid" class="nashGrid"></div>
+<div class="helperBox">
+<div class="muted">Example</div>
+<div><b>I – IV – V – vi</b></div>
+<div id="nashExample" style="margin-top:4px"></div>
+</div>
+</div>
+</section>
+
+<div class="tiny">Chord names can be ambiguous. Your ear and the musical context get the final vote.<br>Chord Lab v7 — smart chords, slash chords & transposing</div>
 </div>
 <script>
 const N=["C","C♯","D","E♭","E","F","F♯","G","A♭","A","B♭","B"];
@@ -122,16 +151,81 @@ const pc=x=>((x%12)+12)%12, uniq=a=>[...new Set(a)].sort((a,b)=>a-b), same=(a,b)
 function chordName(root,t){return N[root]+t.s}
 function notesFor(root,t){return t.iv.map(x=>N[pc(root+x)])}
 function fillInst(sel){Object.entries(inst).forEach(([k,v])=>sel.add(new Option(v.label,k)))}
-["findInst","lookupInst","buildInst"].forEach(id=>fillInst(document.getElementById(id)));
-["lookupRoot","buildRoot"].forEach(id=>N.forEach((n,i)=>document.getElementById(id).add(new Option(n,i))));
+["findInst","lookupInst","buildInst","capoInst"].forEach(id=>fillInst(document.getElementById(id)));
+["lookupRoot","buildRoot","capoRoot","nashKey"].forEach(id=>N.forEach((n,i)=>document.getElementById(id).add(new Option(n,i))));
 types.forEach((t,i)=>document.getElementById("lookupType").add(new Option(t.name,i)));
+types.forEach((t,i)=>document.getElementById("capoType").add(new Option(t.name,i)));
+lookupBass.add(new Option("Root / normal chord","root"));
+N.forEach((n,i)=>lookupBass.add(new Option(n,i)));
+capoFret.add(new Option("None / open","0"));
+for(let i=1;i<=12;i++)capoFret.add(new Option("Fret "+i,String(i)));
 
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab,.screen").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById(b.dataset.screen).classList.add("active")});
 
+
+const analysisTemplates=[
+ {s:"",iv:[0,4,7],f:"1–3–5"},
+ {s:"m",iv:[0,3,7],f:"1–♭3–5"},
+ {s:"7",iv:[0,4,7,10],f:"1–3–5–♭7"},
+ {s:"maj7",iv:[0,4,7,11],f:"1–3–5–7"},
+ {s:"m7",iv:[0,3,7,10],f:"1–♭3–5–♭7"},
+ {s:"sus2",iv:[0,2,7],f:"1–2–5"},
+ {s:"sus4",iv:[0,5,7],f:"1–4–5"},
+ {s:"add9",iv:[0,2,4,7],f:"1–3–5–9"},
+ {s:"6",iv:[0,4,7,9],f:"1–3–5–6"},
+ {s:"m6",iv:[0,3,7,9],f:"1–♭3–5–6"},
+ {s:"dim",iv:[0,3,6],f:"1–♭3–♭5"},
+ {s:"aug",iv:[0,4,8],f:"1–3–♯5"},
+ {s:"9",iv:[0,4,7,10,2],f:"1–3–5–♭7–9"},
+ {s:"maj9",iv:[0,4,7,11,2],f:"1–3–5–7–9"},
+ {s:"m9",iv:[0,3,7,10,2],f:"1–♭3–5–♭7–9"},
+ {s:"11",iv:[0,4,7,10,2,5],f:"1–3–5–♭7–9–11"},
+ {s:"m11",iv:[0,3,7,10,2,5],f:"1–♭3–5–♭7–9–11"},
+ {s:"6/9",iv:[0,4,7,9,2],f:"1–3–5–6–9"},
+ {s:"add11",iv:[0,4,7,5],f:"1–3–5–11"},
+ {s:"maj7♯11",iv:[0,4,7,11,6],f:"1–3–5–7–♯11"},
+ {s:"maj7♯11(no5)",iv:[0,4,11,6],f:"1–3–7–♯11",note:"5 omitted"},
+ {s:"maj7(no5)",iv:[0,4,11],f:"1–3–7",note:"5 omitted"},
+ {s:"m7(no5)",iv:[0,3,10],f:"1–♭3–♭7",note:"5 omitted"},
+ {s:"7(no5)",iv:[0,4,10],f:"1–3–♭7",note:"5 omitted"},
+ {s:"add9(no5)",iv:[0,2,4],f:"1–3–9",note:"5 omitted"}
+];
+
 function identify(pcs,bass){
- let set=uniq(pcs), out=[];
- for(let r=0;r<12;r++) for(const t of types){let target=uniq(t.iv.map(x=>pc(r+x)));if(same(set,target)){let score=100+(r===bass?12:0);out.push({name:chordName(r,t)+(bass!=null&&bass!==r?"/"+N[bass]:""),f:t.f,score})}}
- out.sort((a,b)=>b.score-a.score);return out
+ let set=uniq(pcs), exact=[];
+ for(let r=0;r<12;r++)for(const t of analysisTemplates){
+   let target=uniq(t.iv.map(x=>pc(r+x)));
+   if(same(set,target)){
+     let score=200+(r===bass?14:0)+(t.note?2:0);
+     exact.push({name:N[r]+t.s+(bass!=null&&bass!==r?"/"+N[bass]:""),f:t.f,score,note:t.note||"",root:r});
+   }
+ }
+ exact.sort((a,b)=>b.score-a.score);
+ if(exact.length)return {exact,closest:[]};
+
+ let candidates=[];
+ for(let r=0;r<12;r++)for(const t of analysisTemplates){
+   let target=uniq(t.iv.map(x=>pc(r+x)));
+   let matched=set.filter(x=>target.includes(x));
+   let extra=set.filter(x=>!target.includes(x));
+   let missing=target.filter(x=>!set.includes(x));
+   if(!set.includes(r))continue;
+   let coverage=matched.length/Math.max(target.length,set.length);
+   let score=coverage*100 - extra.length*18 - missing.length*11 + (r===bass?8:0);
+   if(matched.length>=Math.min(3,set.length) && score>35){
+     let details=[];
+     if(missing.length)details.push("missing "+missing.map(x=>N[x]).join(", "));
+     if(extra.length)details.push("extra "+extra.map(x=>N[x]).join(", "));
+     candidates.push({name:N[r]+t.s+(bass!=null&&bass!==r?"/"+N[bass]:""),f:t.f,score,details:details.join(" · "),root:r});
+   }
+ }
+ candidates.sort((a,b)=>b.score-a.score);
+ let closest=[];
+ for(const c of candidates){
+   if(!closest.some(x=>x.name===c.name))closest.push(c);
+   if(closest.length>=4)break;
+ }
+ return {exact:[],closest};
 }
 function renderFind(){
  let key=findInst.value, I=inst[key], mode=findMode.value; findStrings.innerHTML="";
@@ -144,9 +238,26 @@ function updateFind(){
  let I=inst[findInst.value], mode=findMode.value, inputs=[...findStrings.querySelectorAll("input,select")], played=[];
  inputs.forEach((e,i)=>{if(mode==="fret"){let v=e.value.trim().toLowerCase();if(v===""||v==="x"){document.getElementById("snd"+i).textContent=v==="x"?"mute":"—";return}let m=I.open[i]+(+v);played.push({p:pc(m),m});document.getElementById("snd"+i).textContent=N[pc(m)]}else{if(e.value===""){document.getElementById("snd"+i).textContent="—";return}let p=+e.value;played.push({p,m:null});document.getElementById("snd"+i).textContent=N[p]}})
  let set=uniq(played.map(x=>x.p));if(set.length<2){findName.textContent="—";findNotes.textContent="Enter at least two notes.";findFormula.textContent=findAlt.textContent="";return}
- let bass=mode==="fret"?played.filter(x=>x.m!=null).sort((a,b)=>a.m-b.m)[0]?.p:played[0]?.p;let m=identify(set,bass);
- findNotes.textContent="Notes: "+set.map(x=>N[x]).join(" • ");if(!m.length){findName.textContent="Unknown / color chord";findFormula.textContent="No exact common-chord match.";findAlt.textContent="If it sounds good, save the shape.";return}
- findName.textContent=m[0].name;findFormula.textContent="Formula: "+m[0].f;findAlt.textContent=m.length>1?"Also possible: "+m.slice(1,4).map(x=>x.name).join(" · "):""
+ let bass=mode==="fret"?played.filter(x=>x.m!=null).sort((a,b)=>a.m-b.m)[0]?.p:played[0]?.p;
+ let result=identify(set,bass);
+ findNotes.textContent="Notes: "+set.map(x=>N[x]).join(" • ");
+ if(result.exact.length){
+   let m=result.exact;
+   findName.textContent=m[0].name;
+   findFormula.textContent="Formula: "+m[0].f+(m[0].note?" · "+m[0].note:"");
+   findAlt.textContent=m.length>1?"Also possible: "+m.slice(1,4).map(x=>x.name).join(" · "):"";
+   return
+ }
+ if(result.closest.length){
+   let c=result.closest;
+   findName.textContent=c[0].name+" ?";
+   findFormula.textContent="Closest musical match: "+c[0].f+(c[0].details?" · "+c[0].details:"");
+   findAlt.textContent=c.length>1?"Other possibilities: "+c.slice(1,4).map(x=>x.name).join(" · "):"";
+   return
+ }
+ findName.textContent="Color chord";
+ findFormula.textContent="No confident standard name — the note combination may depend heavily on musical context.";
+ findAlt.textContent="The notes are still shown above so you can explore what resolves well from this shape."
 }
 findInst.onchange=renderFind;findMode.onchange=renderFind;clearFind.onclick=()=>{[...findStrings.querySelectorAll("input,select")].forEach(e=>e.value="");updateFind()};exampleFind.onclick=()=>{findMode.value="fret";renderFind();[...findStrings.querySelectorAll("input")].forEach((e,i)=>e.value=inst[findInst.value].example[i]);updateFind()};renderFind();
 
@@ -356,6 +467,33 @@ function shapeCandidates(I,root,t){
  return out
 }
 
+
+const slashShapes={
+ guitar:{
+   "7:maj:11":{arr:["x",2,0,0,3,3],fingers:["x",1,0,0,3,4],kind:"Common Slash Chord"},   // G/B
+   "0:maj:4":{arr:[0,3,2,0,1,0],fingers:[0,3,2,0,1,0],kind:"Common Slash Chord"},       // C/E
+   "2:maj:6":{arr:[2,0,0,2,3,2],fingers:[2,0,0,1,3,2],kind:"Common Slash Chord"},       // D/F#
+   "9:maj:1":{arr:["x",4,2,2,2,0],fingers:["x",3,1,1,1,0],kind:"Common Slash Chord"},   // A/C#
+   "5:maj:9":{arr:["x",0,3,2,1,1],fingers:["x",0,3,2,1,1],kind:"Common Slash Chord"},   // F/A
+   "4:min:7":{arr:[3,"x",2,0,0,0],fingers:[3,"x",2,0,0,0],kind:"Common Slash Chord"},   // Em/G
+   "9:min:0":{arr:["x",3,2,2,1,0],fingers:["x",3,2,2,1,0],kind:"Common Slash Chord"}    // Am/C
+ }
+};
+
+function slashFirstShapes(key,I,root,t,bassWanted){
+  let out=[];
+  const known=slashShapes[key]?.[`${root}:${t.id}:${bassWanted}`];
+  if(known)out.push({...known,score:1200});
+  for(const c of makeBarreShapes(root,t,key)){
+    if(bassPcForShape(c.arr,I)===bassWanted && !out.some(x=>x.arr.join(",")===c.arr.join(",")))out.push({...c,score:800});
+  }
+  for(const c of shapeCandidates(I,root,t)){
+    if(bassPcForShape(c.arr,I)===bassWanted && !out.some(x=>x.arr.join(",")===c.arr.join(",")))out.push(c);
+    if(out.length>=6)break;
+  }
+  return out.slice(0,6);
+}
+
 function playerFirstShapes(key,I,root,t){
   const out=[], known=knownShapes[key]?.[`${root}:${t.id}`];
   if(known)out.push({...known,score:1000});
@@ -456,19 +594,28 @@ function renderSuggestions(){
 
 function renderLookup(){
  let root=+lookupRoot.value,t=types[+lookupType.value],key=lookupInst.value,I=inst[key],name=chordName(root,t);
- lookupInfo.innerHTML=`<div class="muted">CHORD</div><div class="big">${name}</div><div>Notes: ${notesFor(root,t).join(" • ")}</div><div class="formula">Formula: ${t.f}</div>`;
- let shapes=playerFirstShapes(key,I,root,t);voicings.innerHTML="";
+ let bassChoice=lookupBass.value, bassWanted=bassChoice==="root"?root:+bassChoice;
+ let slash=bassWanted!==root, displayChord=slash?`${name}/${N[bassWanted]}`:name;
+ lookupInfo.innerHTML=`<div class="muted">CHORD</div><div class="big">${displayChord}</div><div>Chord tones: ${notesFor(root,t).join(" • ")}</div><div class="formula">Formula: ${t.f}${slash?` · Bass: ${N[bassWanted]}`:""}</div>`;
+ let shapes=slash?slashFirstShapes(key,I,root,t,bassWanted):playerFirstShapes(key,I,root,t);
+ voicings.innerHTML="";
  shapes.forEach((c)=>{
-   let bass=bassPcForShape(c.arr,I), displayName=(bass!==null&&bass!==root)?`${name}/${N[bass]}`:name, kind=c.kind||(bass!==root?"Inversion":"Alternate Voicing");
+   let bass=bassPcForShape(c.arr,I), shapeName=(bass!==null&&bass!==root)?`${name}/${N[bass]}`:name, kind=c.kind||(bass!==root?"Inversion":"Alternate Voicing");
    let d=document.createElement("div");d.className="voicing";
-   let id=displayName+"|"+key+"|"+c.arr.join(","),saved=loadFavs().some(x=>x.id===id);
-   d.innerHTML=`<div class="kind">${kind}</div><b>${displayName}</b>${diagram(c.arr,I,c.fingers)}<div class="fretsText">${c.arr.join(" ")}</div><div class="notes">${soundingNotes(c.arr,I).join(" ")}</div><button class="star ${saved?"saved":""}">${saved?"★ Saved":"☆ Favorite"}</button>`;
-   d.querySelector("button").onclick=()=>saveFav(displayName,key,c.arr);voicings.append(d)
+   let id=shapeName+"|"+key+"|"+c.arr.join(","),saved=loadFavs().some(x=>x.id===id);
+   d.innerHTML=`<div class="kind">${kind}</div><b>${shapeName}</b>${diagram(c.arr,I,c.fingers)}<div class="fretsText">${c.arr.join(" ")}</div><div class="notes">${soundingNotes(c.arr,I).join(" ")}</div><button class="star ${saved?"saved":""}">${saved?"★ Saved":"☆ Favorite"}</button>`;
+   d.querySelector("button").onclick=()=>saveFav(shapeName,key,c.arr);voicings.append(d)
  });
- if(!shapes.length)voicings.innerHTML=`<div class="muted">No compact shape found in the first 12 frets.</div>`;
+ if(!shapes.length)voicings.innerHTML=`<div class="muted">No compact shape found with ${N[bassWanted]} as the lowest note in the first 12 frets. Try another bass note or the normal root-position chord.</div>`;
  renderSuggestions();renderFavs()
 }
-[lookupRoot,lookupType,lookupInst].forEach(x=>x.onchange=renderLookup);leftToggle.onclick=()=>{left=!left;leftToggle.textContent=left?"Left-handed":"Right-handed";renderLookup()};renderLookup();
+[lookupRoot,lookupType,lookupInst].forEach(x=>x.onchange=()=>{
+  lookupBass.innerHTML="";
+  lookupBass.add(new Option("Root / normal chord","root"));
+  N.forEach((n,i)=>lookupBass.add(new Option(n,i)));
+  renderLookup()
+});
+lookupBass.onchange=renderLookup;leftToggle.onclick=()=>{left=!left;leftToggle.textContent=left?"Left-handed":"Right-handed";renderLookup()};renderLookup();
 
 let buildType=0;
 types.forEach((t,i)=>{let b=document.createElement("button");b.className="typeBtn"+(i===0?" active":"");b.textContent=t.name;b.onclick=()=>{buildType=i;document.querySelectorAll(".typeBtn").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderBuild()};typeGrid.append(b)});
@@ -483,6 +630,44 @@ function renderBuild(){
  let major=[0,2,4,5,7,9,11], qualities=["","m","m","","","m","dim"];related.innerHTML="";major.forEach((iv,i)=>{let p=document.createElement("div");p.className="pill";p.textContent=N[pc(r+iv)]+qualities[i];related.append(p)})
 }
 buildRoot.onchange=renderBuild;buildInst.onchange=renderBuild;renderBuild();
+
+function renderCapo(){
+  let root=+capoRoot.value,t=types[+capoType.value],fret=+capoFret.value;
+  let sounding=pc(root+fret);
+  let shapeName=chordName(root,t), soundingName=chordName(sounding,t);
+  capoResult.innerHTML=`<div class="muted">YOU FINGER</div><div class="helperBig">${shapeName}</div><div>${fret?`Capo at fret ${fret}`:"No capo"}</div><div class="muted" style="margin-top:8px">ACTUAL SOUNDING CHORD</div><div class="helperBig">${soundingName}</div><div class="notes">${notesFor(sounding,t).join(" • ")}</div>`;
+}
+[capoInst,capoRoot,capoType,capoFret].forEach(x=>x.onchange=renderCapo);
+renderCapo();
+
+const nashIntervals=[0,2,4,5,7,9,11];
+const nashRoman=["I","ii","iii","IV","V","vi","vii°"];
+const nashTypeIds=["maj","min","min","maj","maj","min","dim"];
+function renderNash(){
+  let key=+nashKey.value;
+  nashGrid.innerHTML="";
+  nashIntervals.forEach((iv,i)=>{
+    let root=pc(key+iv), typeIx=typeIndexById(nashTypeIds[i]), t=types[typeIx];
+    let cell=document.createElement("div");cell.className="nashCell";
+    cell.innerHTML=`<div class="num">${nashRoman[i]}</div><div class="ch">${chordName(root,t)}</div>`;
+    cell.onclick=()=>{
+      lookupRoot.value=String(root);lookupType.value=String(typeIx);lookupBass.value="root";
+      document.querySelectorAll(".tab,.screen").forEach(x=>x.classList.remove("active"));
+      document.querySelector('.tab[data-screen="lookup"]').classList.add("active");
+      document.getElementById("lookup").classList.add("active");
+      renderLookup();
+    };
+    nashGrid.append(cell);
+  });
+  let ex=[0,5,7,9].map(iv=>{
+    let i=nashIntervals.indexOf(iv), root=pc(key+iv), typeIx=typeIndexById(nashTypeIds[i]);
+    return chordName(root,types[typeIx]);
+  });
+  nashExample.textContent=ex.join(" – ");
+}
+nashKey.onchange=renderNash;
+renderNash();
+
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 </script>
 </body></html>

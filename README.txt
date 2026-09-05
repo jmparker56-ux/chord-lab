@@ -1,9 +1,12 @@
-CHORD LAB v4
+CHORD LAB v7
 
-Change from v3:
-- Choose a Chord is now the FIRST tab and the screen that opens automatically.
-- Find My Chord is second.
-- Build a Chord is third.
+New in v7:
+• Smarter Find My Chord — extended/color chords, omitted-note recognition, and closest matches.
+• Test case 3-2-0-0 on baritone is recognized as Fmaj7♯11(no5).
+• Slash chords — optional bass-note selector, including common shapes such as G/B, C/E and D/F♯.
+• Capo Helper — choose a shape and capo fret to see the actual sounding chord.
+• Nashville Number Quick Reference — I ii iii IV V vi vii°, selectable by key; tap a chord to look it up.
+• All v6 player-first guitar and uke voicings remain.
 
-All v3 features remain, including alternate voicings, diagrams, Try This Instead,
-favorites, guitar, tenor low-G/high-G, baritone uke, formulas and chord building.
+For GitHub: upload index.html, manifest.webmanifest, and sw.js.
+Keep the existing icon PNG files; they are unchanged.
